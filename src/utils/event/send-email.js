@@ -12,7 +12,7 @@ eventSend.on("sender", ({ email, user }) => {
             signature: process.env.SIGNATURE_SIGNUP,
             options: { expiresIn: "15m" }
         })
-        const link = `http://localhost:3001/user/confirm-email/${token}`
+        const link = `https://socialgaming-production.up.railway.app/user/confirm-email/${token}`
         const html = confirmTemplate({ link })
         sendEmail({ to: email, html })
     } catch (error) {

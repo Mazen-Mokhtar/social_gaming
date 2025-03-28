@@ -34,10 +34,8 @@ export const confirmEmail = async (req, res, next) => {
     return res.status(200).json({ success: true, message: messageSystem.user.emailIsActived })
 
 }
-export const login = async (req, res, next) => {
-    console.log(req.body)
+export const login = async (req, res, next) => { 
     const { email, password } = req.body;
-    console.log({ email, password })
     const user = await User.findOne({ email });
     if (!user) return next(new Error(messageSystem.user.invalid, { cause: 409 }));
     const cheak = await user.comparePassword(password);
