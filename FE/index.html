@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-aFq/bzH65dt+w6FI2ooMVUpc+21e0SRygnTpmBvdBgSdnuTN7QbdgL+OapgHtvPp" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>ChatApp</title>
+    <style>
+        body {
+            background: linear-gradient(45deg, #0f172a, #1e293b, #334155);
+            min-height: 100vh;
+            font-family: 'Orbitron', sans-serif;
+            /* Futuristic font */
+            overflow-y: auto;
+            color: #fff;
+            position: relative;
+        }
+
+        #userName {
+            font-size: 2rem;
+            font-weight: 900;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+
+        .container {
+            max-width: 1200px;
+            padding: 20px;
+            margin: 20px auto;
+            display: flex;
+            gap: 20px;
+        }
+
+        .chatContainer {
+            background: #1e293b;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            height: 80vh;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 3px solid #22d3ee;
+        }
+
+        .messageList {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto !important;
+            background: #0f172a;
+            display: flex;
+            flex-direction: column-reverse;
+        }
+
+        .messageForm {
+            padding: 15px;
+            background: #1e293b;
+            border-top: 3px solid #22d3ee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #attachImageBtn {
+            position: relative;
+            z-index: 10;
+            /* نضمن إن الزر يكون فوق أي عنصر */
+            padding: 12px 20px;
+            /* نكبر الزر شوية */
+            font-size: 1.2rem;
+            /* نكبر الأيقونة */
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        }
+
+        #attachImageBtn:hover {
+            background: #06b6d4;
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(6, 182, 212, 0.7);
+        }
+
+        #messageBody {
+            border: 3px solid #22d3ee;
+            border-radius: 12px;
+            padding: 12px 18px;
+            font-size: 1.2rem;
+            flex: 1;
+            background: #0f172a;
+            color: #fff;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        #messageBody:focus {
+            border-color: #06b6d4;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.7);
+            outline: none;
+        }
+
+        #sendMessage {
+            position: relative;
+            z-index: 10;
+            /* نضمن إن الزر يكون فوق العناصر التانية */
+            border-radius: 12px;
+            padding: 12px 30px;
+            /* نضمن إن الزر كبير كفاية */
+            font-weight: 800;
+            background: #22d3ee;
+            border: none;
+            color: #0f172a;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        }
+
+        #sendMessage:hover {
+            background: #06b6d4;
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(6, 182, 212, 0.7);
+        }
+
+        .users-wrapper {
+            position: relative;
+            width: 60px;
+            /* Collapsed width */
+            transition: width 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            /* Dramatic easing */
+        }
+
+        .users-wrapper.open {
+            width: 300px;
+            /* Expanded width */
+        }
+
+        .chatUsers {
+            background: #1e293b;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            height: 80vh;
+            overflow-y: auto;
+            border: 3px solid #22d3ee;
+            padding: 20px;
+            transform: scale(0.9);
+            opacity: 0;
+            transition: transform 0.4s ease, opacity 0.3s ease;
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+        }
+
+        .users-wrapper.open .chatUsers {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .users-toggle {
+            position: absolute;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background: #22d3ee;
+            border-radius: 50% 0 0 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+            box-shadow: 0 5px 15px rgba(6, 182, 212, 0.5);
+            transition: background 0.3s ease;
+            z-index: 2;
+        }
+
+        .users-toggle:hover {
+            background: #06b6d4;
+        }
+
+        .chatUser {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            background: #0f172a;
+            margin-bottom: 12px;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .chatUser:hover {
+            background: #22d3ee;
+            transform: translateX(10px);
+            color: #0f172a;
+        }
+
+        .chatImage {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
+            border: 3px solid #22d3ee;
+        }
+
+
+
+        /* باقي الـ CSS زي ما هو، بس هنعدل الجزء ده */
+        .messageList {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            background: #0f172a;
+            display: flex;
+            flex-direction: column-reverse;
+            /* الرسايل من تحت لفوق */
+        }
+
+        .me,
+        .myFriend {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 12px;
+            max-width: 80%;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+            /* عشان الوقت يتحط جوا البوكس */
+        }
+
+        .me {
+            margin-right: auto;
+            /* رسايلك على الشمال */
+            background: #22d3ee;
+            color: #0f172a;
+        }
+
+        .me.read {
+            background: #06b6d4;
+        }
+
+        .myFriend {
+            margin-left: auto;
+            /* رسايل الـ friend على اليمين */
+            background: #64748b;
+            color: #fff;
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            color: #d1d5db;
+            /* لون رمادي فاتح سهل القراءة */
+            margin-left: 10px;
+            /* مسافة بسيطة بعد النص */
+            opacity: 0.8;
+            /* خفيف عشان ما يبقاش مزعج */
+        }
+
+        .read-mark {
+            font-size: 0.9rem;
+            color: #fff;
+            /* اللون الأبيض عشان يبان على الخلفية */
+            margin-left: 5px;
+            /* مسافة بسيطة بعد الوقت */
+            vertical-align: middle;
+        }
+
+        .noResult {
+            color: #94a3b8;
+            font-style: italic;
+            padding: 25px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .attachments {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .attachment-image {
+            transition: transform 0.2s ease;
+        }
+
+        .attachment-image:hover {
+            transform: scale(1.05);
+        }
+
+        .typing-indicator {
+            color: #888;
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        .unread-count {
+            font-size: 0.9rem;
+            padding: 4px 8px;
+            border-radius: 50%;
+            vertical-align: middle;
+        }
+
+        .online-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #10b981;
+            /* أخضر للأونلاين */
+            display: inline-block;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        #imagePreview img {
+            max-width: 100px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        #imagePreview img:hover {
+            transform: scale(1.05);
+        }
+
+        #logoutBtn {
+            position: absolute;
+            top: 5px;
+            right: 20px;
+            padding: 12px 30px;
+            font-weight: 800;
+            background: #ff6b6b;
+            /* لون أحمر فاتح */
+            border: 3px solid #dc3545;
+            /* إطار أحمر غامق */
+            border-radius: 12px;
+            color: #0f172a;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        }
+
+        #logoutBtn:hover {
+            background: #dc3545;
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(220, 53, 69, 0.7);
+        }
+
+        .like-btn {
+            background: none;
+            border: none;
+            color: #425f88;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: color 0.3s ease;
+        }
+
+        .like-btn.liked {
+            color: #ff6b6b;
+            /* لون القلب عند الإعجاب */
+        }
+
+        .like-btn .fas {
+            margin-right: 5px;
+        }
+
+        .like-count {
+            font-weight: bold;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 15px rgba(34, 211, 238, 0.5);
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <h1 id="userName" class="w-100 p-3 text-success"></h1>
+    <button id="logoutBtn" class="btn my-1"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    <div class="container">
+        <div class="chatContainer border border-success">
+            <div>
+                <h2 id="lol" class="text-success text-center">Chatting App</h2>
+            </div>
+            <div id="messageList" class="messageList my-1"></div>
+            <div class="messageForm p-2">
+                <input id="messageBody" class="mt-2 my-1" type="text" placeholder="Message">
+                <input id="messageImage" type="file" accept="image/*" multiple style="display: none;">
+                <button id="attachImageBtn" class="btn btn-outline-secondary my-1" type="button">📎</button>
+                <button id="sendMessage" class="btn btn-success" type="button">Send</button>
+                <div id="imagePreview" class="attachments mt-2" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                </div>
+            </div>
+        </div>
+        <div class="users-wrapper">
+            <div class="users-toggle">→</div>
+            <div id="chatUsers" class="chatUsers border border-success"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="./node_modules/jwt-decode/build/jwt-decode.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="./node_modules/socket.io/client-dist/socket.io.min.js"></script>
+    <script src="./js/index.js" type="module"></script>
+    <script>
+        $(document).ready(() => {
+            $('.users-toggle').on('click', () => {
+                $('.users-wrapper').toggleClass('open');
+                $('.users-toggle').text($('.users-wrapper').hasClass('open') ? '←' : '→');
+            });
+        });
+    </script>
+</body>
+
+</html>
