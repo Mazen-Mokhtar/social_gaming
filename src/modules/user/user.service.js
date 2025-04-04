@@ -105,13 +105,33 @@ export const getAllUser = async (req, res, next) => {
 }
 export const updateProfile = async (req, res, next) => {
     const { userData } = req;
-    const { phone, password, DOB, userName, gender } = req.body
-    userData.set(req.body);
-    phone && userData.isModified("phone")
-    password && userData.isModified("password")
-    await userData.save();
-    return res.status(200).json({ success: true, message: messageSystem.user.updatedSuccessfully });
-}
+    const { phone, password, DOB, userName, gender } = req.body;
+
+    if (userName !== undefined && userName !== '') userData.userName = userName;
+    if (phone !== undefined && phone !== '') {
+        userData.isModified("phone")
+        userData.phone = phone;
+    }
+    if (gender !== undefined && gender !== '') userData.gender = gender;
+    if (DOB !== undefined && DOB !== '') userData.DOB = DOB;
+    if (password !== undefined && password !== '') {
+        userData.isModified("password")
+        userData.password = password;
+    }
+
+    try {
+        await userData.save();
+        return res.status(200).json({
+            success: true,
+            message: messageSystem.user.updatedSuccessfully
+        });
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            error: error.message
+        });
+    }
+};
 export const updateImage = async (req, res, next) => {
     const { userData } = req;
     let options = {};

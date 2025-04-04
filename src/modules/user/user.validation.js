@@ -9,18 +9,17 @@ export const getAllUser = joi.object().keys({
 }).required()
 export const updateProfile = joi.object().keys({
     authorization: joi.string().required(),
-    userName: joi.string().min(2).max(20).alphanum(),
-    password: joi.string().pattern(new RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/)),
-    confirmPassword: joi.string().valid(joi.ref("password")).when("password",
-        {
-            is: joi.exist(),
-            then: joi.required(),
-            otherwise: joi.optional()
-        }),
-    phone: joi.string().pattern(new RegExp(/^(002|\+2)?01[0125][0-9]{8}$/)),
-    gender: joi.string().valid("male", "female"),
-    DOB: joi.date().less("now")
-}).required()
+    userName: joi.string().min(2).max(20).alphanum().optional().allow(''),
+    password: joi.string().pattern(new RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/)).optional().allow(''),
+    confirmPassword: joi.string().valid(joi.ref("password")).when("password", {
+        is: joi.exist(),
+        then: joi.required(),
+        otherwise: joi.optional().allow('')
+    }),
+    phone: joi.string().pattern(new RegExp(/^(002|\+2)?01[0125][0-9]{8}$/)).optional().allow(''),
+    gender: joi.string().valid("male", "female").optional().allow(''),
+    DOB: joi.date().less("now").optional().allow('')
+}).required();
 export const updateImage = joi.object().keys({
     authorization: joi.string().required(),
     file: joi.object().required()
