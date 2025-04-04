@@ -67,6 +67,10 @@ const userSchema = new Schema(
         {
             type: { secure_url: String, public_id: String }
         },
+        coverImage:
+        {
+            type: { secure_url: String, public_id: String }
+        },
         confirmEmail:
         {
             type: Boolean,

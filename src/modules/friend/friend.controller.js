@@ -15,5 +15,5 @@ router.get("/search", authorizationV2, validation(schema.searchForFriends), asyn
 router.get("/suggestions", authorizationV2, validation(schema.suggestionsFriends), asyncHandler(friendService.suggestionsFriends))
 router.get("/mutual-friends/:id", authorizationV2, validation(schema.mutualFriends), asyncHandler(friendService.mutualFriends))
 router.delete("/block-user/:id", authorizationV2, validation(schema.blockUser), asyncHandler(friendService.blockUser))
-router.put("/unBlock-user/:id", authorizationV2, validation(schema.unBlockUser), asyncHandler(friendService.unBlockUser))
+router.delete("/unBlock-user/:id", authorizationV2, validation(schema.unBlockUser), asyncHandler(friendService.unBlockUser))
 export default router;

@@ -26,7 +26,8 @@ export const messageSystem =
         notAuthorized: "Not Authorized",
         authorization: "Authorization Is Required",
         isAlreadyDeleted: "User Is Already Deleted",
-        freezeAcc: "User Is Freezed In 60 Days Login To Return The Account "
+        freezeAcc: "User Is Freezed In 60 Days Login To Return The Account ",
+        dontHaveBlockListYet: "Dont Have block list yet"
     },
     friend: {
         ...generateMessage("Friend Requset"),

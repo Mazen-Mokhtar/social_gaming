@@ -17,6 +17,10 @@ router.get("/all-user",
     authorizationV2,
     validation(schema.getAllUser), asyncHandler(userService.getAllUser))
 
+router.get("/get-blocks",
+    authorizationV2,
+    validation(schema.getBlocks), asyncHandler(userService.getBlocks))
+
 router.get("/search",
     authorizationV2,
     validation(schema.search), asyncHandler(userService.search)
@@ -30,5 +34,10 @@ router.patch("/updateImage",
     authorizationV2,
     uploadFile(fileValid.image).single("attachment"),
     validation(schema.updateImage), asyncHandler(userService.updateImage))
+
+router.patch("/updateCover",
+    authorizationV2,
+    uploadFile(fileValid.image).single("attachment"),
+    validation(schema.updateCoverImage), asyncHandler(userService.updateCoverImage))
 
 export default router

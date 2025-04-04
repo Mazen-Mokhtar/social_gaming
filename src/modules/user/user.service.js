@@ -164,3 +164,41 @@ export const search = async (req, res, next) => {
     // إرجاع البيانات بدون أي معلومات إضافية مثل العدد
     return res.status(200).json({ success: true, data: users });
 };
+export const getBlocks = async (req, res, next) => {
+    const { userData } = req
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+    if (userData.blocked.length === 0)
+        return next(new Error(messageSystem.user.dontHaveBlockListYet, { cause: 404 }))
+    await userData.populate({
+        path: "blocked",
+        select: "userName profileImage isOnline verification",
+        options: { skip, limit },
+    });
+    return res.status(200).json({ success: true, data: userData.blocked })
+}
+export const updateCoverImage = async (req, res, next) => {
+    const { userData } = req;
+
+    // التحقق من وجود ملف مرفوع
+    if (!req.file || !req.file.path) {
+        return next(new Error("No cover image provided", { cause: 400 }));
+    }
+    let options = {};
+    if (userData.coverImage && userData.coverImage.public_id) {
+        options.public_id = userData.coverImage.public_id;
+    } else {
+        options.folder = `social-app/users/${userData._id.toString()}/profileCover` ;
+    }
+
+    const { secure_url, public_id } = await cloud().uploader.upload(req.file.path, options);
+
+    userData.coverImage = { secure_url, public_id };
+    await userData.save();
+
+    return res.status(200).json({
+        success: true,
+        data: userData,
+    });
+};

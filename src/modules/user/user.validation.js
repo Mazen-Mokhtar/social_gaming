@@ -4,6 +4,11 @@ import { isValid } from "../../middleware/validation.js";
 export const getProfile = joi.object().keys({
     authorization: joi.string().required()
 }).required()
+export const getBlocks = joi.object().keys({
+    authorization: joi.string().required(),
+    page: joi.number(),
+    limit: joi.number(),
+}).required()
 export const getAllUser = joi.object().keys({
     authorization: joi.string().required()
 }).required()
@@ -21,6 +26,10 @@ export const updateProfile = joi.object().keys({
     DOB: joi.date().less("now").optional().allow('')
 }).required();
 export const updateImage = joi.object().keys({
+    authorization: joi.string().required(),
+    file: joi.object().required()
+})
+export const updateCoverImage = joi.object().keys({
     authorization: joi.string().required(),
     file: joi.object().required()
 })
