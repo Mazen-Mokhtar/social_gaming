@@ -14,7 +14,12 @@ export const getAllUser = joi.object().keys({
 }).required()
 export const updateProfile = joi.object().keys({
     authorization: joi.string().required(),
-    userName: joi.string().min(2).max(20).alphanum().optional().allow(''),
+    userName: joi.string()
+        .min(2)
+        .max(20)
+        .pattern(/^(?! )[A-Za-z0-9]+(?: [A-Za-z0-9]+)*(?<! )$/)
+        .optional()
+        .allow(''),
     password: joi.string().pattern(new RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/)).optional().allow(''),
     confirmPassword: joi.string().valid(joi.ref("password")).when("password", {
         is: joi.exist(),
