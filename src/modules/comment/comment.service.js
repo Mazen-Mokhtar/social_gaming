@@ -77,14 +77,77 @@ export const deleteComment = async (req, res, next) => {
 }
 export const getReplies = async (req, res, next) => {
     const { id } = req.params;
+
+    // تعطيل virtuals في الـ User schema
     User.schema.set("toJSON", { virtuals: false });
-    Comment.schema.set("toJSON", { virtuals: true })
-    const replise = await Comment.find({ perentComment: id })
-        .populate([{ path: "senderId", select: "userName profileImage _id verification" }])
-    if (replise.length == 0)
-        return next(new Error(messageSystem.comment.notFound))
-    return res.status(200).json({ success: true, data: replise })
-}
+
+    // تفعيل virtuals في الـ Comment schema
+    Comment.schema.set("toJSON", { virtuals: true });
+
+    try {
+        const replies = await Comment.aggregate([
+            {
+                $match: { perentComment: new mongoose.Types.ObjectId(id) } // جلب الردود الخاصة بالتعليق
+            },
+            {
+                $lookup: {
+                    from: "users", // الربط مع مجموعة الـ Users
+                    localField: "senderId",
+                    foreignField: "_id",
+                    as: "senderId"
+                }
+            },
+            {
+                $unwind: "$senderId" // لفصل الـ senderId
+            },
+            {
+                $project: {
+                    _id: 1,
+                    content: 1,
+                    attachment: 1,
+                    postId: 1,
+                    senderId: {
+                        _id: 1,
+                        userName: 1,
+                        profileImage: 1,
+                        verification: 1
+                    },
+                    likes: {
+                        $map: {
+                            input: { $ifNull: ["$likes", []] }, // إذا كانت null، تحويلها لمصفوفة فارغة
+                            as: "like",
+                            in: {
+                                _id: "$$like._id",
+                                userName: "$$like.userName",
+                                profileImage: "$$like.profileImage"
+                            }
+                        }
+                    },
+                    likeCount: { $size: { $ifNull: ["$likes", []] } }, // استخدام $ifNull للتأكد من أن likes هي مصفوفة
+                    isDeleted: 1,
+                    createdAt: 1,
+                    updatedAt: 1,
+                    replyCount: {
+                        $size: {
+                            $filter: {
+                                input: { $ifNull: ["$replies", []] }, // استخدام $ifNull للتأكد من أن replies هي مصفوفة
+                                cond: { $eq: ["$$this.isDeleted", false] }
+                            }
+                        }
+                    } // Count non-deleted replies
+                }
+            }
+        ]);
+
+        if (replies.length === 0) {
+            return next(new Error(messageSystem.comment.notFound));
+        }
+
+        return res.status(200).json({ success: true, data: replies });
+    } catch (error) {
+        return next(error);
+    }
+};
 export const getComment = async (req, res, next) => {
     const { postId } = req.params;
     const { page = 1 } = req.query; // Default page to 1 if not provided

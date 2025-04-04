@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Schema, model } from "mongoose";
 
 
@@ -15,7 +16,7 @@ const notificationSchema = new Schema(
         },
         type: {
             type: String,
-            enum: ["like", "comment", "frinedRequest", "mention"],
+            enum: ["like", "comment", "friendRequest", "mention"],
             required: true,
         },
         post: {
@@ -37,7 +38,7 @@ const notificationSchema = new Schema(
     { timestamps: true }
 );
 
-
+delete mongoose.connection.models["Notification"]
 const Notification = model("Notification", notificationSchema);
 
 export default Notification

@@ -36,7 +36,7 @@ export const sendFriendRequest = async (req, res, next) => {
         resverId: cheakUser._id,
         pending: true
     })
-    notificationEvent.emit("send", { type: "frinedRequest", sender: userData._id, userId: id })
+    notificationEvent.emit("send", { type: "friendRequest", sender: userData._id, userId: id })
     return res.status(201).json({ success: true, message: messageSystem.friend.createdSuccessfully })
 }
 export const cancelFriendRequest = async (req, res, next) => {

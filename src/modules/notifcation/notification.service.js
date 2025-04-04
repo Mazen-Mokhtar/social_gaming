@@ -8,6 +8,7 @@ export const getNotification = async (req, res, next) => {
     const noifications = await Notification.find({ user: userData._id })
         .populate([{ path: "sender", select: "userName profileImage verification" }]).sort({ createdAt: -1 })
     await Notification.updateMany({ user: userData._id }, { isRead: true })
+    console.log(noifications)
     return res.status(200).json(
         { success: true, data: noifications })
 }

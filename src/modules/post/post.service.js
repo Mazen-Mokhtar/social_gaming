@@ -423,6 +423,7 @@ export const userPostsId = async (req, res, next) => {
     const skip = (page - 1) * limit;
 
     Post.schema.set("toJSON", { virtuals: true });
+    Post.schema.set("toObject", { virtuals: true });
     User.schema.set("toJSON", { virtuals: false });
 
     const userPosts = await Post.find({ userId: id, isDeleted: false })
@@ -433,7 +434,7 @@ export const userPostsId = async (req, res, next) => {
             path: "userId",
             select: "userName profileImage verification"
         }, {
-            path: "comments"
+            path: "comments", select: "_id"
         }]);
 
     if (userPosts.length === 0) {

@@ -105,7 +105,7 @@ export const getAllUser = async (req, res, next) => {
 }
 export const updateProfile = async (req, res, next) => {
     const { userData } = req;
-    const { phone, password } = req.body
+    const { phone, password, DOB, userName, gender } = req.body
     userData.set(req.body);
     phone && userData.isModified("phone")
     password && userData.isModified("password")

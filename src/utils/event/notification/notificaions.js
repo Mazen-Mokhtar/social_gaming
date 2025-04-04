@@ -16,7 +16,7 @@ notificationEvent.on("send", async ({ userId, sender, type, postId = undefined }
         case "comment":
             message = "Comment in your post";
             break;
-        case "frinedRequest":
+        case "friendRequest":
             message = "Send Friend Request";
             break;
         case "mention":
