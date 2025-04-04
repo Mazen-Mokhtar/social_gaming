@@ -101,6 +101,14 @@ export const getReplies = async (req, res, next) => {
                 $unwind: "$senderId" // لفصل الـ senderId
             },
             {
+                $lookup: {
+                    from: "comments", // الربط مع الكومنتات تاني للحصول على الردود
+                    localField: "_id",
+                    foreignField: "perentComment",
+                    as: "replies"
+                }
+            },
+            {
                 $project: {
                     _id: 1,
                     content: 1,
@@ -114,7 +122,7 @@ export const getReplies = async (req, res, next) => {
                     },
                     likes: {
                         $map: {
-                            input: { $ifNull: ["$likes", []] }, // إذا كانت null، تحويلها لمصفوفة فارغة
+                            input: { $ifNull: ["$likes", []] },
                             as: "like",
                             in: {
                                 _id: "$$like._id",
@@ -123,18 +131,19 @@ export const getReplies = async (req, res, next) => {
                             }
                         }
                     },
-                    likeCount: { $size: { $ifNull: ["$likes", []] } }, // استخدام $ifNull للتأكد من أن likes هي مصفوفة
+                    likeCount: { $size: { $ifNull: ["$likes", []] } },
                     isDeleted: 1,
                     createdAt: 1,
                     updatedAt: 1,
                     replyCount: {
                         $size: {
                             $filter: {
-                                input: { $ifNull: ["$replies", []] }, // استخدام $ifNull للتأكد من أن replies هي مصفوفة
-                                cond: { $eq: ["$$this.isDeleted", false] }
+                                input: { $ifNull: ["$replies", []] },
+                                as: "reply",
+                                cond: { $eq: ["$$reply.isDeleted", false] }
                             }
                         }
-                    } // Count non-deleted replies
+                    }
                 }
             }
         ]);
@@ -148,6 +157,7 @@ export const getReplies = async (req, res, next) => {
         return next(error);
     }
 };
+
 export const getComment = async (req, res, next) => {
     const { postId } = req.params;
     const { page = 1 } = req.query; // Default page to 1 if not provided
