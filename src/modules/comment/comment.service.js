@@ -36,7 +36,7 @@ export const addComment = async (req, res, next) => {
         path: "senderId",
         select: "userName profileImage verification"
     });
-    if (userData._id !== cheakPost)
+    if (userData._id !== cheakPost.userId)
         notificationEvent.emit("send", { type: "comment", sender: userData._id, postId, userId: cheakPost.userId })
     return res.status(201).json(
         {
